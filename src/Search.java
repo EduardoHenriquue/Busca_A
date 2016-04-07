@@ -32,7 +32,7 @@ public class Search {
      */
     public NodeSearch search() {
         int cont = 0;
-        this.frontier.offer(this.nodeSearch); // adiciona o nó de busca com o estado inicial na fronteira
+        this.frontier.add(this.nodeSearch); // adiciona o nó de busca com o estado inicial na fronteira
 
         while(true) {
             String text = "";
@@ -105,9 +105,9 @@ public class Search {
 
             if(nodeInfo.getState().getName().equals(node.getState().getName())) {
                 System.out.println(nodeInfo.getState().getName());
-                if (nodeSearchTotalCost < nodeTotalCost) {
-                    NodeSearch nodeAux = new NodeSearch(node.getState(), nodeSearchTotalCost);
-                    front.offer(nodeAux);
+                if (node.compareTo(nodeInfo) == -1) {
+                    NodeSearch nodeAux = new NodeSearch(node.getState(), node.getCostG()+node.getState().getEstimate());
+                    front.add(nodeAux);
                     return front;
                 } else {
                     return front;
@@ -115,7 +115,7 @@ public class Search {
             }
         }
         NodeSearch nodeAux1 = new NodeSearch(node.getState(), nodeSearchTotalCost);
-        front.offer(nodeAux1);
+        front.add(nodeAux1);
 
         return front;
     }
@@ -127,22 +127,29 @@ public class Search {
      * @throws Exception
      */
     public NodeSearch chooseNewState(PriorityQueue front) {
-        NodeSearch head = (NodeSearch) front.poll(); // retorna a cabeça da fila
+        NodeSearch head = this.frontier.poll(); //*******
+        NodeSearch nodeAux;
+        Iterator<NodeSearch> iterator = this.frontier.iterator();
+        while (iterator.hasNext()){
+            nodeAux = iterator.next();
+            if (nodeAux.compareTo(head) == -1){
+                head = nodeAux;
+            }
+        }
         return head;
     }
 
 
     public void printPath(NodeSearch node){
-        Iterator<NodeSearch> iterator = this.frontier.iterator();
-        NodeSearch nodeAux = node;
+        State parent = node.getParent();
         System.out.println(node.getState().getName());
 
-        while(nodeAux.getParent() != null){
-            System.out.println("Parent: "+nodeAux.getParent().getName());
-            while (iterator.hasNext()){
-                NodeSearch nodeInfo = iterator.next();
-                if (nodeInfo.getParent() != null) {
-                    nodeAux.setParent(nodeInfo.getParent());
+        while(parent != null){
+            System.out.println("Parent: " + parent);
+            for (Map.Entry<State, Integer> entry: parent.getActions().entrySet()){
+                State state = entry.getKey();
+                if (state.getName().equals(parent.getName())) {
+                    parent = state;
                 }
             }
         }

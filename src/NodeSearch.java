@@ -35,9 +35,9 @@ public class NodeSearch implements Comparable<NodeSearch>{
 
     @Override
     public int compareTo(NodeSearch node) {
-        if(this.costG < node.getCostG()){
+        if(this.getState().getEstimate()+this.costG < node.getCostG()+node.getState().getEstimate()){
             return -1;
-        } else if(this.costG > node.getCostG()){
+        } else if(this.costG+this.getState().getEstimate() > node.getCostG()+node.getState().getEstimate()){
             return 1;
         }
         return 0;
